@@ -20,6 +20,7 @@ a{
     width: 60px;
     margin-left: 35%;
     background-color: aqua;
+    padding: 5px;
 }
 .container, .container2{
     width: 200px;

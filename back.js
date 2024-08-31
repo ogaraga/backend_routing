@@ -38,19 +38,27 @@ app.post('/send_mes', async (req, res) => {
     // const {email}= req.body;
     const aUser = await user.findOne({ email: req.body.email });
     if (aUser) {
-        res.sendFile(__dirname + '/view/empt.html');
+        return res.sendFile(__dirname + '/view/empt.html');
 
     } else {
         try {
-            const usars = await user.create(req.body);
+            if (req.body.password.length >= 4) {
+                const usars = await user.create(req.body);
 
-            await usars.save()
-            console.log(usars)
-            setTimeout(() => {
+                await usars.save()
+                console.log(usars)
+                setTimeout(() => {
 
-                res.sendFile(__dirname + '/view/succ.html');
-            }, 3000);
+                    res.sendFile(__dirname + '/view/succ.html');
+                }, 3000);
 
+
+            } else {
+                setTimeout(() => {
+                    res.send(`<p style = "color: white; text-align: center; background-color: grey">400 error : Short password not allowed!</p>`)
+
+                }, 3000);
+            }
 
         } catch (error) {
             res.sendFile(__dirname + '/view/int.html');
@@ -61,7 +69,7 @@ app.post('/send_mes', async (req, res) => {
 //login route
 app.post('/login', async (req, res) => {
     const already = await user.findOne({ email: req.body.email });
-    if (already) {
+    if (already && already.password === req.body.password) {
         setTimeout(() => {
             res.sendFile(__dirname + '/view/open.html')
         }, 3000);
@@ -69,10 +77,10 @@ app.post('/login', async (req, res) => {
 
         setTimeout(() => {
 
-            return res.redirect('/')
+            res.send(`<p style = "color: white; text-align: center; background-color: grey">Email does not exist or password mismatched</p>`)
         }, 3000);
     }
-})
+});
 
 // database
 const connected = mongoose.connect('mongodb+srv://raymondogaraga:12345@cluster0.xe7bkfb.mongodb.net/playform?retryWrites=true&w=majority&appName=Cluster0').then(() => console.log('Database connected!')).catch(() => console.log('Database disconnected!'))
